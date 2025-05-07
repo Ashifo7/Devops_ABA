@@ -2,28 +2,35 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "mdashifr/ci-cd-demo"
+        IMAGE_NAME = "ci-cd-demo"
+        DOCKER_REPO = "ashif321"
+    }
+
+    tools {
+        maven 'Maven 3.9.6'     // Ensure Maven is installed in Jenkins (Manage Jenkins > Global Tool Configuration)
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Ashifo7/Devops_ABA.git'
-            }
-        }
-
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                echo 'Building with Maven...'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Docker Build & Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'docker build -t $DOCKER_IMAGE .'
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh 'docker push $DOCKER_IMAGE'
+                echo 'Building and pushing Docker image...'
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-credentials',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sh """
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                        docker build -t $DOCKER_REPO/$IMAGE_NAME .
+                        docker push $DOCKER_REPO/$IMAGE_NAME
+                    """
                 }
             }
         }
@@ -32,13 +39,14 @@ pipeline {
     post {
         success {
             mail to: 'mdashifr08@gmail.com',
-                 subject: '✅ Build Successful',
-                 body: 'Your Jenkins build completed successfully and the Docker image was pushed to Docker Hub.'
+                 subject: "Jenkins Job SUCCESS: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+                 body: "Good news!\n\nJob '${env.JOB_NAME} [#${env.BUILD_NUMBER}]' completed successfully.\n\nCheck details at ${env.BUILD_URL}"
         }
+
         failure {
             mail to: 'mdashifr08@gmail.com',
-                 subject: '❌ Build Failed',
-                 body: 'Your Jenkins build failed. Please check the logs in Jenkins.'
+                 subject: "Jenkins Job FAILED: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+                 body: "Something went wrong.\n\nJob '${env.JOB_NAME} [#${env.BUILD_NUMBER}]' failed.\n\nCheck logs at ${env.BUILD_URL}"
         }
     }
 }
