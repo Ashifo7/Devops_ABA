@@ -6,9 +6,9 @@ pipeline {
         DOCKER_REPO = "ashif321"
     }
 
-    tools {
-        maven 'Maven 3.9.6'     // Ensure Maven is installed in Jenkins (Manage Jenkins > Global Tool Configuration)
-    }
+   tools {
+    maven 'Maven-3.9.9'
+}
 
     stages {
         stage('Build with Maven') {
