@@ -7,32 +7,32 @@ pipeline {
     }
 
     tools {
-        maven 'Maven-3.9.9'  // Ensure this name matches your Jenkins tool config
+        maven 'Maven-3.9.9' // Adjust this if your tool name is different
     }
 
     stages {
         stage('Build with Maven') {
             steps {
-                echo '🔧 Building project using Maven...'
+                echo 'Building project using Maven...'
                 sh 'mvn clean package -DskipTests'
             }
             post {
                 success {
                     mail to: 'mdashifr08@gmail.com',
-                         subject: "✅ STAGE SUCCESS: Build with Maven - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                         body: "✔️ The 'Build with Maven' stage completed successfully.\n\nCheck: ${env.BUILD_URL}"
+                         subject: "STAGE SUCCESS: Build with Maven - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                         body: "The 'Build with Maven' stage completed successfully.\n\nCheck: ${env.BUILD_URL}"
                 }
                 failure {
                     mail to: 'mdashifr08@gmail.com',
-                         subject: "❌ STAGE FAILURE: Build with Maven - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                         body: "❗ The 'Build with Maven' stage failed.\n\nCheck logs: ${env.BUILD_URL}"
+                         subject: "STAGE FAILURE: Build with Maven - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                         body: "The 'Build with Maven' stage failed.\n\nCheck logs: ${env.BUILD_URL}"
                 }
             }
         }
 
         stage('Docker Build & Push') {
             steps {
-                echo '🐳 Building and pushing Docker image...'
+                echo 'Building and pushing Docker image...'
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-hub-credentials',
                     usernameVariable: 'DOCKER_USERNAME',
@@ -48,13 +48,13 @@ pipeline {
             post {
                 success {
                     mail to: 'mdashifr08@gmail.com',
-                         subject: "✅ STAGE SUCCESS: Docker Build & Push - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                         body: "✔️ The 'Docker Build & Push' stage completed successfully.\n\nCheck: ${env.BUILD_URL}"
+                         subject: "STAGE SUCCESS: Docker Build & Push - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                         body: "The 'Docker Build & Push' stage completed successfully.\n\nCheck: ${env.BUILD_URL}"
                 }
                 failure {
                     mail to: 'mdashifr08@gmail.com',
-                         subject: "❌ STAGE FAILURE: Docker Build & Push - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                         body: "❗ The 'Docker Build & Push' stage failed.\n\nCheck logs: ${env.BUILD_URL}"
+                         subject: "STAGE FAILURE: Docker Build & Push - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                         body: "The 'Docker Build & Push' stage failed.\n\nCheck logs: ${env.BUILD_URL}"
                 }
             }
         }
@@ -63,13 +63,13 @@ pipeline {
     post {
         success {
             mail to: 'mdashifr08@gmail.com',
-                 subject: "🎉 BUILD SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The Jenkins job '${env.JOB_NAME} #${env.BUILD_NUMBER}' has completed successfully.\n\nSee details: ${env.BUILD_URL}"
+                 subject: "BUILD SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The Jenkins job '${env.JOB_NAME} #${env.BUILD_NUMBER}' completed successfully.\n\nSee details: ${env.BUILD_URL}"
         }
         failure {
             mail to: 'mdashifr08@gmail.com',
-                 subject: "🔥 BUILD FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The Jenkins job '${env.JOB_NAME} #${env.BUILD_NUMBER}' has failed.\n\nInvestigate logs: ${env.BUILD_URL}"
+                 subject: "BUILD FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The Jenkins job '${env.JOB_NAME} #${env.BUILD_NUMBER}' failed.\n\nSee details: ${env.BUILD_URL}"
         }
     }
 }
